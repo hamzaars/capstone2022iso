@@ -2,7 +2,7 @@
 
 **main.py** contains the GUI code and communication code
 
-It needs the VotTracker.py in the same folder to run which keeps count of the currect volume in the syringe
+It needs the VotTracker.py in the same folder to run; this file keeps count of the currect volume in the syringe
 
 **commTest.py** is used to troubleshoot the communcation
 
