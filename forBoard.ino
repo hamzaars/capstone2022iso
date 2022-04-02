@@ -2,6 +2,7 @@
 #include <string.h>
 #include <AccelStepper.h>
 
+// set up libraries and data types
 String all;
 
 int led = 8;
@@ -18,7 +19,7 @@ int speedM = 50;
 int switch_top;
 int switch_bottom;
 
-
+// Function to move steps in a direction
 void moveOneStepF(int M0pin, int M1pin, int M2pin, int rpm){
   AccelStepper stepper = AccelStepper(1,stepPin, dirPin);
   stepper.setMaxSpeed(1000);
@@ -30,13 +31,14 @@ void moveOneStepF(int M0pin, int M1pin, int M2pin, int rpm){
 
   stepper.setCurrentPosition(0);
 
-  while(stepper.currentPosition() !=50){
+  while(stepper.currentPosition() !=50){ // set up right now to move 50 full steps
     stepper.setSpeed(-rpm);
     stepper.runSpeed();
   }
   delay(100);
 }
 
+// Function to move steps in th eopposite direction
 void moveOneStepB(int M0pin, int M1pin, int M2pin, int rpm){
   AccelStepper stepper = AccelStepper(1,stepPin, dirPin);
   stepper.setMaxSpeed(1000);
@@ -46,7 +48,7 @@ void moveOneStepB(int M0pin, int M1pin, int M2pin, int rpm){
   digitalWrite(M1pin,LOW);
   digitalWrite(M2pin, LOW);
 
-  stepper.setCurrentPosition(50);
+  stepper.setCurrentPosition(50); // set up to move 50 steps in the oppostie direction
 
   while(stepper.currentPosition() !=0){
     stepper.setSpeed(-rpm);
@@ -55,6 +57,7 @@ void moveOneStepB(int M0pin, int M1pin, int M2pin, int rpm){
   delay(100);
 }
 
+//Function to move motor a fixed number of steps forward (move plunger down)
 void motormoving_fixedSteps_forward(char M0pin_state,char M1pin_state,char M2pin_state, int M0pin, int M1pin, int M2pin, char switchpinTop, char switchpinBottom, int stepPin, int dirPin, int rpm , int steps) {  
   AccelStepper stepper = AccelStepper(1,stepPin, dirPin);
   stepper.setMaxSpeed(1000);
@@ -68,16 +71,16 @@ void motormoving_fixedSteps_forward(char M0pin_state,char M1pin_state,char M2pin
   stepper.setCurrentPosition(0);
 
   //Run the motor 
-  while(stepper.currentPosition() != steps){
+  while(stepper.currentPosition() != steps){ // move the motor until equal to the input steps
     stepper.setSpeed(rpm);
     stepper.runSpeed();
-    if (digitalRead(switchpinTop) == LOW || digitalRead(switchpinBottom) == LOW) {
+    if (digitalRead(switchpinTop) == LOW || digitalRead(switchpinBottom) == LOW) { // if the limit switch is pressed
      delay(50);
-     do{
+     do{// move back until not pressed
       stepper.setSpeed(-rpm);
       stepper.runSpeed(); 
      }while( digitalRead(switchpinBottom) == LOW || digitalRead(switchpinTop) == LOW );
-     moveOneStepB(M0pin,M1pin,M2pin,rpm);
+     moveOneStepB(M0pin,M1pin,M2pin,rpm); // and then move 50 steps in the opposite direction still to get away from the transistory state
      break;
     }
   }
@@ -85,6 +88,8 @@ void motormoving_fixedSteps_forward(char M0pin_state,char M1pin_state,char M2pin
   Serial.println(stepper.currentPosition());
 }
 
+
+//Function to move motor a fixed number of steps backward (move plunger up)
 void motormoving_fixedSteps_backward(char M0pin_state,char M1pin_state,char M2pin_state, int M0pin, int M1pin, int M2pin, char switchpinTop, char switchpinBottom, int stepPin, int dirPin, int rpm , int steps) {  
   AccelStepper stepper = AccelStepper(1,stepPin, dirPin);
   stepper.setMaxSpeed(1000);
@@ -98,16 +103,16 @@ void motormoving_fixedSteps_backward(char M0pin_state,char M1pin_state,char M2pi
   stepper.setCurrentPosition(steps);
  
   //Run the motor 
-  while(stepper.currentPosition() != 0){
+  while(stepper.currentPosition() != 0){ // move until the number of steps is 0
     stepper.setSpeed(rpm);
     stepper.runSpeed();
-    if (digitalRead(switchpinTop) == LOW || digitalRead(switchpinBottom) == LOW) {
+    if (digitalRead(switchpinTop) == LOW || digitalRead(switchpinBottom) == LOW) { // if limit switch is pressed
      delay(50);
-     do{
+     do{ // move in the opposite direction until the switch is not pressed
       stepper.setSpeed(-rpm);
       stepper.runSpeed(); 
      }while( digitalRead(switchpinBottom) == LOW || digitalRead(switchpinTop) == LOW );
-     moveOneStepF(M0pin,M1pin,M2pin,rpm);
+     moveOneStepF(M0pin,M1pin,M2pin,rpm); // and then move 50 steps more in the opposite direction to get out of the transistory state
      break;
     } 
   }
@@ -115,6 +120,9 @@ void motormoving_fixedSteps_backward(char M0pin_state,char M1pin_state,char M2pi
   Serial.println(steps-(stepper.currentPosition()));
 }
 
+
+
+//Function to move motor a until limit switch is pressed
 void motormoving_untilswitchpressed(char M0pin_state,char M1pin_state,char M2pin_state, int M0pin, int M1pin, int M2pin, char switchpinTop,char switchpinBottom, int stepPin, int dirPin, int rpm) {  
   AccelStepper stepper = AccelStepper(1,stepPin, dirPin);
   stepper.setMaxSpeed(1000);
@@ -128,14 +136,14 @@ void motormoving_untilswitchpressed(char M0pin_state,char M1pin_state,char M2pin
   stepper.setCurrentPosition(0);
  
   //Run the motor 
-  while(digitalRead(switchpinBottom) == HIGH && digitalRead(switchpinTop) == HIGH ){
+  while(digitalRead(switchpinBottom) == HIGH && digitalRead(switchpinTop) == HIGH ){ // limit switch not pressed
     stepper.setSpeed(rpm);
     stepper.runSpeed();
     
-    if (digitalRead(switchpinBottom) == LOW || digitalRead(switchpinTop) == LOW ) { 
+    if (digitalRead(switchpinBottom) == LOW || digitalRead(switchpinTop) == LOW ) {  // pressed
      delay(50);
      do{
-      stepper.setSpeed(-rpm);
+      stepper.setSpeed(-rpm); // move in the opposite direction until not pressed
       stepper.runSpeed();
       delay(50);
      }while( digitalRead(switchpinBottom) == LOW || digitalRead(switchpinTop) == LOW );
@@ -145,8 +153,12 @@ void motormoving_untilswitchpressed(char M0pin_state,char M1pin_state,char M2pin
   delay(100);  
 }
 
+
+
+//Main logic code for  moving the motor
 void moveMotor(char motor, int full, int half, int quarter){
 
+// set the speed
   int rpmf = speedM;
   int rpmh = speedM;
   int rpmq = speedM;
@@ -160,7 +172,7 @@ void moveMotor(char motor, int full, int half, int quarter){
     dirPin = 9;
     switch_top = 54;
     switch_bottom = 55; 
-    if(motor == 'c'){
+    if(motor == 'c'){ // opposite, dispenser
       full = full*-1;
       half = half*-1;
       quarter = quarter*-1;
@@ -176,7 +188,7 @@ void moveMotor(char motor, int full, int half, int quarter){
     dirPin = 4;
     switch_top = 56;
     switch_bottom = 57; 
-    if(motor == 'p'){
+    if(motor == 'p'){// opposite, puncture
       full = full*-1;
       half = half*-1;
       quarter = quarter*-1;
@@ -193,7 +205,7 @@ void moveMotor(char motor, int full, int half, int quarter){
       rpmh = rpmh*-1;
       rpmq = rpmq*-1;
     }
-  }else if (motor == 'x' || motor == 'y'){
+  }else if (motor == 'x' || motor == 'y'){ // move all the way down/up
     M0 = 13;
     M1 = 12;
     M2 = 11;
@@ -277,6 +289,7 @@ void setup(){
   
 Serial.begin(9600);  
 
+// set up pull up resistors and input pins
 pinMode(M0, INPUT);
 pinMode(M1, INPUT);
 pinMode(M2, INPUT);
@@ -326,7 +339,7 @@ while (Serial.available()==0){} // wait until a response is received from Python
   int quarter = quarterS.toInt();
 
   // move motors based on logic sent
-  moveMotor(motor, full, half, quarter);
+  moveMotor(motor, full, half, quarter); // function to move motors
 
   delay(500);
 
