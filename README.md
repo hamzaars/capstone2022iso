@@ -14,4 +14,4 @@ Please note, if you want to run the Arduino directly from this code (i.e. not us
 
 Refer to Section 2.3.4 Data Transfer for all possible combinations. For now, the prototype code can only run d, c, p, o, x, and y letter combinations.
 
-**motorcodefunctions_v3.ino** is used to troubleshoot the motors.
+**motorcodefunctions_v4.ino** is used to troubleshoot the motors.
