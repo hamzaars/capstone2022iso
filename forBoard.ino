@@ -31,14 +31,14 @@ void moveOneStepF(int M0pin, int M1pin, int M2pin, int rpm){
 
   stepper.setCurrentPosition(0);
 
-  while(stepper.currentPosition() !=50){ // set up right now to move 50 full steps
+  while(stepper.currentPosition() !=200){ // set up right now to move 200 full steps
     stepper.setSpeed(-rpm);
     stepper.runSpeed();
   }
   delay(100);
 }
 
-// Function to move steps in th eopposite direction
+// Function to move steps in the opposite direction
 void moveOneStepB(int M0pin, int M1pin, int M2pin, int rpm){
   AccelStepper stepper = AccelStepper(1,stepPin, dirPin);
   stepper.setMaxSpeed(1000);
@@ -48,7 +48,7 @@ void moveOneStepB(int M0pin, int M1pin, int M2pin, int rpm){
   digitalWrite(M1pin,LOW);
   digitalWrite(M2pin, LOW);
 
-  stepper.setCurrentPosition(50); // set up to move 50 steps in the oppostie direction
+  stepper.setCurrentPosition(200); // set up to move 200 steps in the oppostie direction
 
   while(stepper.currentPosition() !=0){
     stepper.setSpeed(-rpm);
@@ -80,7 +80,7 @@ void motormoving_fixedSteps_forward(char M0pin_state,char M1pin_state,char M2pin
       stepper.setSpeed(-rpm);
       stepper.runSpeed(); 
      }while( digitalRead(switchpinBottom) == LOW || digitalRead(switchpinTop) == LOW );
-     moveOneStepB(M0pin,M1pin,M2pin,rpm); // and then move 50 steps in the opposite direction still to get away from the transistory state
+     moveOneStepB(M0pin,M1pin,M2pin,rpm); // and then move 200 steps in the opposite direction still to get away from the transistory state
      break;
     }
   }
@@ -112,7 +112,7 @@ void motormoving_fixedSteps_backward(char M0pin_state,char M1pin_state,char M2pi
       stepper.setSpeed(-rpm);
       stepper.runSpeed(); 
      }while( digitalRead(switchpinBottom) == LOW || digitalRead(switchpinTop) == LOW );
-     moveOneStepF(M0pin,M1pin,M2pin,rpm); // and then move 50 steps more in the opposite direction to get out of the transistory state
+     moveOneStepF(M0pin,M1pin,M2pin,rpm); // and then move 200 steps more in the opposite direction to get out of the transistory state
      break;
     } 
   }
